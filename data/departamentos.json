@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": 1,
+    "nome": "Vendas",
+    "chefe_id": 4
+  },
+  {
+    "id": 2,
+    "nome": "Marketing Digital",
+    "chefe_id": 5
+  }
+]

@@ -22,7 +22,7 @@ type Funcionario struct {
 
 // Create
 func (f *Funcionario) Salvar() {
-	funcionarios, err := carregarFuncionarios()
+	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
 		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
 		return
@@ -46,7 +46,7 @@ func (f *Funcionario) Salvar() {
 
 // Update
 func (f *Funcionario) Atualizar() {
-	funcionarios, err := carregarFuncionarios()
+	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
 		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
 		return
@@ -69,7 +69,7 @@ func (f *Funcionario) Atualizar() {
 
 // Delete
 func (f *Funcionario) Deletar() {
-	funcionarios, err := carregarFuncionarios()
+	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
 		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
 		return
@@ -92,7 +92,7 @@ func (f *Funcionario) Deletar() {
 
 // Read
 func ListarFuncionarios() {
-	funcionarios, err := carregarFuncionarios()
+	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
 		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
 		return
@@ -106,7 +106,7 @@ func ListarFuncionarios() {
 
 // Funções utilitárias
 
-func carregarFuncionarios() ([]Funcionario, error) {
+func CarregarFuncionarios() ([]Funcionario, error) {
 	var funcionarios []Funcionario
 
 	file, err := os.Open(arquivoFuncionarios)

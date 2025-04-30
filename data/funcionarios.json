@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": "A",
+    "nome": "Hiel",
+    "cpf": "123.456.789-00",
+    "cep": "61635-025",
+    "salario": "5000",
+    "data_nascimento": "2000-11-20",
+    "sexo": "M",
+    "departamento_id": 1
+  },
+  {
+    "id": "B",
+    "nome": "Conrado Silva",
+    "cpf": "234.567.890-11",
+    "cep": "60142-412",
+    "salario": "4000",
+    "data_nascimento": "2002-10-05",
+    "sexo": "M",
+    "departamento_id": 2
+  },
+  {
+    "id": "313",
+    "nome": "Conradinho",
+    "cpf": "00100200398",
+    "cep": "60710050",
+    "salario": "2000",
+    "data_nascimento": "05/10/2004",
+    "sexo": "Masculino",
+    "departamento_id": 5
+  }
+]
