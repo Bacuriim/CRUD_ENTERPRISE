@@ -51,7 +51,11 @@ func main() {
 					f.CPF, f.CEP, f.Salario, f.DataNascimento, f.Sexo)))
 			listaFuncionarios.Add(card)
 		}
+
 		listaFuncionarios.Refresh()
+		windowList.SetCloseIntercept(func() {
+			windowList.Hide()
+		})
 	})
 
 	windowList.SetContent(container.NewVBox(
