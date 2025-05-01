@@ -2,6 +2,7 @@ package main
 
 import (
 	"crud-enterprise/models"
+	"crud-enterprise/utils"
 	"fmt"
 	"strconv"
 
@@ -13,7 +14,7 @@ import (
 
 func main() {
 	a := app.New() // cria com ID fixo
-	windowMain := a.NewWindow("Meu App Fyne")
+	windowMain := a.NewWindow("CRUD Empresarial")
 	windowMain.Resize(fyne.NewSize(800, 600))
 	windowList := a.NewWindow("Funcionários Existentes")
 	windowList.Resize(fyne.NewSize(800, 600))
@@ -36,21 +37,46 @@ func main() {
 	entryDepartamentoID.SetPlaceHolder("Digite o ID do departamento aqui")
 
 	listaFuncionarios := container.NewVBox()
+	btnCriar := widget.NewButton("Criar funcionário", func() {
+		depID, err := strconv.Atoi(entryDepartamentoID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do departamento:", err)
+			return
+		} else {
+			entryDepartamentoID.SetText(strconv.Itoa(depID))
+		}
+		funcionario := models.Funcionario{
+			ID:             entryID.Text,
+			Nome:           entryName.Text,
+			CPF:            entryCPF.Text,
+			CEP:            entryCEP.Text,
+			Salario:        entrySalario.Text,
+			DataNascimento: entryDataNascimento.Text,
+			Sexo:           entrySexo.Text,
+			DepartamentoID: depID,
+		}
+		funcionario.Salvar()
+		utils.LimparCampos(entryID, entryName, entryCPF, entryCEP,
+			entrySalario, entryDataNascimento, entrySexo, entryDepartamentoID)
+		fmt.Println("Funcionário criado:", funcionario)
+	})
 	btnListar := widget.NewButton("Listar Funcionários", func() {
-		windowList.Show()
 		funcionarios, err := models.CarregarFuncionarios()
 		if err != nil {
 			fmt.Println("Erro:", err)
 			return
 		}
-		listaFuncionarios.Objects = nil // limpa
+
+		listaFuncionarios.RemoveAll()
+
 		for _, f := range funcionarios {
 			card := widget.NewCard(f.Nome,
-				fmt.Sprintf("ID: %s | Departamento: %d", f.ID, f.DepartamentoID),
-				widget.NewLabel(fmt.Sprintf("CPF: %s\nCEP: %s\nSalário: %s\nNascimento: %s\nSexo: %s",
-					f.CPF, f.CEP, f.Salario, f.DataNascimento, f.Sexo)))
+				"",
+				widget.NewLabel(fmt.Sprintf("ID: %s\nDepartamento: %d\nCPF: %s\nCEP: %s\nSalário: %s\nNascimento: %s\nSexo: %s",
+					f.ID, f.DepartamentoID, f.CPF, f.CEP, f.Salario, f.DataNascimento, f.Sexo)))
 			listaFuncionarios.Add(card)
 		}
+		windowList.Show()
 
 		listaFuncionarios.Refresh()
 		windowList.SetCloseIntercept(func() {
@@ -58,7 +84,7 @@ func main() {
 		})
 	})
 
-	windowList.SetContent(container.NewVBox(
+	windowList.SetContent(container.NewScroll(
 		listaFuncionarios,
 	))
 
@@ -71,121 +97,16 @@ func main() {
 		entryDataNascimento,
 		entrySexo,
 		entryDepartamentoID,
-		widget.NewButton("Criar funcionário", func() {
-			depID, err := strconv.Atoi(entryDepartamentoID.Text)
-			if err != nil {
-				fmt.Println("Erro ao converter ID do departamento:", err)
-				return
-			} else {
-				entryDepartamentoID.SetText(strconv.Itoa(depID))
-			}
-			funcionario := models.Funcionario{
-				ID:             entryID.Text,
-				Nome:           entryName.Text,
-				CPF:            entryCPF.Text,
-				CEP:            entryCEP.Text,
-				Salario:        entrySalario.Text,
-				DataNascimento: entryDataNascimento.Text,
-				Sexo:           entrySexo.Text,
-				DepartamentoID: depID,
-			}
-			funcionario.Salvar()
-			fmt.Println("Funcionário criado:", funcionario)
-		}),
 
 		container.NewVBox(
+			btnCriar,
 			btnListar,
 		),
 	))
 
-	// Roda a lógica do CRUD em paralelo
-	go func() {
-		// 1. Criando funcionários
-		hiel := models.Funcionario{
-			ID:             "A",
-			Nome:           "Hiel",
-			CPF:            "123.456.789-00",
-			CEP:            "61635-025",
-			Salario:        "5000",
-			DataNascimento: "2000-11-20",
-			Sexo:           "M",
-			DepartamentoID: 1,
-		}
-
-		conrado := models.Funcionario{
-			ID:             "B",
-			Nome:           "Conrado",
-			CPF:            "234.567.890-11",
-			CEP:            "60142-412",
-			Salario:        "3467",
-			DataNascimento: "2002-10-05",
-			Sexo:           "M",
-			DepartamentoID: 2,
-		}
-
-		pimenta := models.Funcionario{
-			ID:             "C",
-			Nome:           "Pimenta",
-			CPF:            "345.678.901-22",
-			CEP:            "62431-931",
-			Salario:        "10045",
-			DataNascimento: "2004-08-05",
-			Sexo:           "M",
-			DepartamentoID: 3,
-		}
-
-		// CRUD funcionários
-		hiel.Salvar()
-		conrado.Salvar()
-		pimenta.Salvar()
-		fmt.Println()
-		models.ListarFuncionarios()
-		fmt.Println()
-
-		conradoAtualizado := models.Funcionario{
-			ID:             "B",
-			Nome:           "Conrado Silva",
-			CPF:            "234.567.890-11",
-			CEP:            "60142-412",
-			Salario:        "4000",
-			DataNascimento: "2002-10-05",
-			Sexo:           "M",
-			DepartamentoID: 2,
-		}
-		conradoAtualizado.Atualizar()
-		fmt.Println()
-		models.ListarFuncionarios()
-		fmt.Println()
-		pimenta.Deletar()
-		fmt.Println()
-		models.ListarFuncionarios()
-		fmt.Println()
-
-		// CRUD departamentos
-		vendas := models.Departamento{ID: 1, Nome: "Vendas", ChefeID: 4}
-		marketing := models.Departamento{ID: 2, Nome: "Marketing", ChefeID: 5}
-		pesquisa := models.Departamento{ID: 3, Nome: "P&D", ChefeID: 6}
-
-		vendas.Salvar()
-		marketing.Salvar()
-		pesquisa.Salvar()
-		fmt.Println()
-		models.ListarDepartamentos()
-		fmt.Println()
-
-		marketingAtualizado := models.Departamento{ID: 2, Nome: "Marketing Digital", ChefeID: 5}
-		marketingAtualizado.Atualizar()
-		fmt.Println()
-		models.ListarDepartamentos()
-		fmt.Println()
-		pesquisa.Deletar()
-		fmt.Println()
-		models.ListarDepartamentos()
-		fmt.Println()
-
-		// utils.EsvaziarArquivoJSON("data/funcionarios.json")
-		// utils.EsvaziarArquivoJSON("data/departamentos.json")
-	}()
-
+	windowMain.SetCloseIntercept(func() {
+		utils.EsvaziarArquivoJSON("data/funcionarios.json")
+		windowMain.Close()
+	})
 	windowMain.ShowAndRun()
 }
