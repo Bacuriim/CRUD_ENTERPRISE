@@ -7,7 +7,10 @@ import (
 	"os"
 )
 
-const arquivoFuncionarios = "data/funcionarios.json"
+const (
+	arquivoFuncionariosJSON = "data/json/funcionarios.json"
+	arquivoFuncionariosTXT  = "data/txt/funcionarios.txt"
+)
 
 type Funcionario struct {
 	ID             string `json:"id"`
@@ -42,6 +45,7 @@ func (f *Funcionario) Salvar() {
 	}
 
 	fmt.Printf("Funcionário com ID %s salvo com sucesso.\n", f.ID)
+	sincronizarFuncionariosTxt(funcionarios)
 }
 
 // Update
@@ -60,6 +64,7 @@ func (f *Funcionario) Atualizar() {
 				return
 			}
 			fmt.Printf("Funcionário com ID %s atualizado com sucesso.\n", f.ID)
+			sincronizarFuncionariosTxt(funcionarios)
 			return
 		}
 	}
@@ -83,6 +88,7 @@ func (f *Funcionario) Deletar() {
 				return
 			}
 			fmt.Printf("Funcionário com ID %s deletado com sucesso.\n", f.ID)
+			sincronizarFuncionariosTxt(funcionarios)
 			return
 		}
 	}
@@ -100,7 +106,8 @@ func ListarFuncionarios() {
 
 	fmt.Println("Lista de funcionários:")
 	for _, f := range funcionarios {
-		fmt.Printf("%+v\n", f)
+		fmt.Printf("ID: %s, Nome: %s, CPF: %s, CEP: %s, Salário: %s, Data de Nascimento: %s, Sexo: %s, DepartamentoID: %d\n",
+			f.ID, f.Nome, f.CPF, f.CEP, f.Salario, f.DataNascimento, f.Sexo, f.DepartamentoID)
 	}
 }
 
@@ -109,7 +116,7 @@ func ListarFuncionarios() {
 func CarregarFuncionarios() ([]Funcionario, error) {
 	var funcionarios []Funcionario
 
-	file, err := os.Open(arquivoFuncionarios)
+	file, err := os.Open(arquivoFuncionariosJSON)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return funcionarios, nil // Arquivo não existe ainda
@@ -127,7 +134,7 @@ func CarregarFuncionarios() ([]Funcionario, error) {
 }
 
 func salvarFuncionarios(funcionarios []Funcionario) error {
-	file, err := os.Create(arquivoFuncionarios)
+	file, err := os.Create(arquivoFuncionariosJSON)
 	if err != nil {
 		return err
 	}
@@ -136,4 +143,26 @@ func salvarFuncionarios(funcionarios []Funcionario) error {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	return encoder.Encode(funcionarios)
+}
+
+// Sincronizar o estado do JSON com o arquivo TXT
+func sincronizarFuncionariosTxt(funcionarios []Funcionario) {
+	file, err := os.Create(arquivoFuncionariosTXT)
+	if err != nil {
+		fmt.Printf("Erro ao criar arquivo TXT: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	for _, f := range funcionarios {
+		linha := fmt.Sprintf("ID: %s, Nome: %s, CPF: %s, CEP: %s, Salário: %s, Data de Nascimento: %s, Sexo: %s, DepartamentoID: %d\n",
+			f.ID, f.Nome, f.CPF, f.CEP, f.Salario, f.DataNascimento, f.Sexo, f.DepartamentoID)
+		_, err := file.WriteString(linha)
+		if err != nil {
+			fmt.Printf("Erro ao escrever no arquivo TXT: %v\n", err)
+			return
+		}
+	}
+
+	fmt.Println("Arquivo TXT sincronizado com sucesso.")
 }

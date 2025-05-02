@@ -1,0 +1,12 @@
+[
+  {
+    "id": "D",
+    "funcionario_id": "A",
+    "projeto_id": 201
+  },
+  {
+    "id": "E",
+    "funcionario_id": "B",
+    "projeto_id": 202
+  }
+]

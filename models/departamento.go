@@ -7,12 +7,15 @@ import (
 	"os"
 )
 
-const arquivoDepartamentos = "data/departamentos.json"
+const (
+	arquivoDepartamentosJSON = "data/json/departamentos.json"
+	arquivoDepartamentosTXT  = "data/txt/departamentos.txt"
+)
 
 type Departamento struct {
 	ID      int    `json:"id"`
 	Nome    string `json:"nome"`
-	ChefeID int    `json:"chefe_id"`
+	ChefeID int    `json:"chefe_id"` // Novo campo para associar o chefe ao departamento
 }
 
 // Create
@@ -37,6 +40,7 @@ func (d *Departamento) Salvar() {
 	}
 
 	fmt.Printf("Departamento com ID %d salvo com sucesso.\n", d.ID)
+	sincronizarDepartamentosTxt(departamentos)
 }
 
 // Update
@@ -55,6 +59,7 @@ func (d *Departamento) Atualizar() {
 				return
 			}
 			fmt.Printf("Departamento com ID %d atualizado com sucesso.\n", d.ID)
+			sincronizarDepartamentosTxt(departamentos)
 			return
 		}
 	}
@@ -78,6 +83,7 @@ func (d *Departamento) Deletar() {
 				return
 			}
 			fmt.Printf("Departamento com ID %d deletado com sucesso.\n", d.ID)
+			sincronizarDepartamentosTxt(departamentos)
 			return
 		}
 	}
@@ -95,7 +101,7 @@ func ListarDepartamentos() {
 
 	fmt.Println("Lista de departamentos:")
 	for _, d := range departamentos {
-		fmt.Printf("%+v\n", d)
+		fmt.Printf("ID: %d, Nome: %s, ChefeID: %d\n", d.ID, d.Nome, d.ChefeID)
 	}
 }
 
@@ -104,7 +110,7 @@ func ListarDepartamentos() {
 func carregarDepartamentos() ([]Departamento, error) {
 	var departamentos []Departamento
 
-	file, err := os.Open(arquivoDepartamentos)
+	file, err := os.Open(arquivoDepartamentosJSON)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return departamentos, nil // Arquivo não existe ainda
@@ -122,7 +128,7 @@ func carregarDepartamentos() ([]Departamento, error) {
 }
 
 func salvarDepartamentos(departamentos []Departamento) error {
-	file, err := os.Create(arquivoDepartamentos)
+	file, err := os.Create(arquivoDepartamentosJSON)
 	if err != nil {
 		return err
 	}
@@ -131,4 +137,25 @@ func salvarDepartamentos(departamentos []Departamento) error {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	return encoder.Encode(departamentos)
+}
+
+// Sincronizar o estado do JSON com o arquivo TXT
+func sincronizarDepartamentosTxt(departamentos []Departamento) {
+	file, err := os.Create(arquivoDepartamentosTXT)
+	if err != nil {
+		fmt.Printf("Erro ao criar arquivo TXT: %v\n", err)
+		return
+	}
+	defer file.Close()
+
+	for _, d := range departamentos {
+		linha := fmt.Sprintf("ID: %d, Nome: %s, ChefeID: %d\n", d.ID, d.Nome, d.ChefeID)
+		_, err := file.WriteString(linha)
+		if err != nil {
+			fmt.Printf("Erro ao escrever no arquivo TXT: %v\n", err)
+			return
+		}
+	}
+
+	fmt.Println("Arquivo TXT sincronizado com sucesso.")
 }
