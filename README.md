@@ -2,56 +2,104 @@
 
 ## Table of Contents
 
-1. [Overview](#overview)
-2. [Features](#features)
-3. [Project Structure](#project-structure)
-4. [Requirements](#requirements)
-5. [How to Run](#how-to-run)
-6. [Team](#team)
+- [Crud Enterprise](#crud-enterprise)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Features](#features)
+  - [Project Structure](#project-structure)
+  - [Requirements](#requirements)
+  - [How to Run](#how-to-run)
+  - [Team](#team)
 
 ---
 
 ## Overview
 
-This project is a simple implementation of a CRUD (Create, Read, Update, Delete) system in Go. It manages two main entities: Employees (```funcionarios```) and Departments (```departamentos```). The data is stored in JSON files, and the application demonstrates basic operations for managing these entities.
+This project is a simple implementation of a CRUD (Create, Read, Update, Delete) system in Go. It manages five main entities: Bosses (```chefes_departamentos```), Departments (```departamentos```), Employees (```funcionarios```), Employees_Departments (```funcionarios_departamentos```) and Projects (```projetos```). The data is momently persisted in JSON files and storage in Text files. The application demonstrates basic operations for managing these entities.
 
 ---
 
 ## Features
 
-- Employees CRUD:
-   - Add new employees.
-   - Update existing employees by ID.
-   - Delete employees by ID.
-   - List all employees.
+- Bosses CRUD:
+   - Add new bosses to existing departments.
+   - Update existing bosses by ID.
+   - Delete bosses by ID.
+   - List all bosses.
 
 - Departments CRUD:
-   - Add new departments.
+   - Add new departments to existing bosses.
    - Update existing departments by ID.
    - Delete departments by ID.
    - List all departments.
 
+- Employees CRUD:
+   - Add new employees to existing departments.
+   - Update existing employees by ID.
+   - Delete employees by ID.
+   - List all employees.
+
+- Employees_Projects CRUD:
+   - Add new employees to new projects.
+   - Update existing employees to existing projects by ID.
+   - Delete employees from projects by ID.
+   - List all employees from projects.
+
+- Projects CRUD:
+   - Add new projects to existing employees and departments.
+   - Update existing projects by ID.
+   - Delete projects by ID.
+   - List all projects.
+
 - JSON Persistence:
-   - All data is stored in JSON files (```data/funcionarios.json``` and ```data/departamentos.json```).
+   - All data is momently stored in JSON files (```data/json/chefes_departamentos.json```), (```data/json/departamentos.json```), (```data/json/funcionarios.json```), , (```data/json/funcionarios_projetos.json```) and (```data/json/projetos.json```), and stored in text files.
    - The JSON files are cleared at the end of the program execution.
+
+- Text Storage:
+   - All data is stored in Text files (```data/txt/chefes_departamentos.txt```), (```data/txt/departamentos.txt```), (```data/txt/funcionarios.txt```), , (```data/txt/funcionarios_projetos.txt```) and (```data/txt/projetos.txt```).
 
 ---
 
 ## Project Structure
 
 ```bash
-📦 CRUD_ENTERPRISE            # Main project folder
+📦 CRUD_ENTERPRISE   # Main project folder
+┣ 📂 controllers  
+┃ ┣ 🐹 screen_controller.go     
 ┣ 📂 data
-┃ ┣ 📄 funcionarios.json      # JSON file for storing employees
-┃ ┣ 📄 departamentos.json     # JSON file for storing departments
+┃ ┣ 📂 json
+┃ ┃ ┣ 💾 chefes_departamentos.json
+┃ ┃ ┣ 💾 departamentos.json
+┃ ┃ ┣ 💾 funcionarios.json
+┃ ┃ ┣ 💾 funcionarios_projetos.json
+┃ ┃ ┣ 💾 projetos.json
+┃ ┣ 📂 txt
+┃ ┃ ┣ 📄 chefes_departamentos.txt
+┃ ┃ ┣ 📄 departamentos.txt
+┃ ┃ ┣ 📄 funcionarios.txt
+┃ ┃ ┣ 📄 funcionarios_projetos.txt
+┃ ┃ ┣ 📄 projetos.txt
 ┣ 📂 models
-┃ ┣ 🐹 funcionario.go         # CRUD logic for employees
-┃ ┣ 🐹 departamento.go        # CRUD logic for departments
+┃ ┣ 🐹 chefe_departamento.go             # CRUD logic for bosses
+┃ ┣ 🐹 departamento.go                   # CRUD logic for departments
+┃ ┣ 🐹 funcionario.go                    # CRUD logic for employees
+┃ ┣ 🐹 funcionarios_projetos.go          # CRUD logic for employees and projects
+┃ ┣ 🐹 projetos.go                       # CRUD logic for projects
 ┣ 📂 utils
-┃ ┣ 🐹 utils.go               # Utility functions (e.g., clearing JSON files)
-┣ 🐹 main.go                  # Entry point of the application
-┣ 🛠️ go.mod                   # Go module file
-┣ 📄 README.md                # Project documentation          
+┃ ┣ 🐹 gui_utils.go                      # Utility functions (e.g., clearing Entry Widgets)
+┃ ┣ 🐹 utils.go                          # Utility functions (e.g., clearing JSON files)
+┣ 📂 views
+┃ ┣ 📂 main_view
+┃ ┃ ┣ 🐹 main_page.go                    # GUI main page
+┃ ┣ 📂 table_view 
+┃ ┃ ┣ 🐹 chefes_departamentos_page.go    # GUI for bosses
+┃ ┃ ┣ 🐹 departamentos_page.go           # GUI for departments
+┃ ┃ ┣ 🐹 funcionarios_page.go            # GUI for employees
+┃ ┃ ┣ 🐹 projetos_page.go                # GUI for projects
+┣ 🛠️ go.mod                              # Go module file
+┣ 🛠️ go.sum                              # Go Sum file
+┣ 🐹 main.go                             # Entry point of the application
+┣ 📄 README.md                           # Project documentation          
 ```
 
 ---
@@ -74,7 +122,13 @@ This project is a simple implementation of a CRUD (Create, Read, Update, Delete)
 git clone https://github.com/Bacuriim/CRUD_ENTERPRISE.git
 ````
 
-2. Run the application:
+2. Install the dependencies:
+
+````bash
+go mod tidy
+````
+
+3. Run the application:
 
 ````bash
 go run main.go

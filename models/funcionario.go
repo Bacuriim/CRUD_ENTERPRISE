@@ -24,28 +24,44 @@ type Funcionario struct {
 }
 
 // Create
-func (f *Funcionario) Salvar() {
+func (f *Funcionario) Salvar(departamentos []int) string {
 	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
-		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar funcionários: %v\n", err)
 	}
 
 	for _, funcionario := range funcionarios {
-		if funcionario.ID == f.ID {
-			fmt.Printf("Erro: já existe um funcionário com o ID %s. Ação não realizada.\n", f.ID)
-			return
+		if f.Nome == "" || f.CPF == "" || f.CEP == "" || f.Salario == "" || f.DataNascimento == "" || f.Sexo == "" {
+			return "Erro: todos os campos devem ser preenchidos. Ação não realizada.\n"
 		}
+		if funcionario.ID == f.ID {
+			return fmt.Sprintf("Erro: já existe um funcionário com o ID %s. Ação não realizada.\n", f.ID)
+		}
+
+		if funcionario.CPF == f.CPF {
+			return fmt.Sprintf("Erro: já existe um funcionário com o CPF %s. Ação não realizada.\n", f.CPF)
+		}
+	}
+
+	departamentoValido := false
+	for _, departamentoID := range departamentos {
+		if f.DepartamentoID == departamentoID {
+			departamentoValido = true
+			break
+		}
+	}
+
+	if !departamentoValido {
+		return fmt.Sprintf("DepartamentoID %d não encontrado", f.DepartamentoID)
 	}
 
 	funcionarios = append(funcionarios, *f)
 	if err := salvarFuncionarios(funcionarios); err != nil {
-		fmt.Printf("Erro ao salvar funcionário: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao salvar funcionário: %v\n", err)
 	}
 
-	fmt.Printf("Funcionário com ID %s salvo com sucesso.\n", f.ID)
 	sincronizarFuncionariosTxt(funcionarios)
+	return fmt.Sprintf("Funcionário com ID %s salvo com sucesso.\n", f.ID)
 }
 
 // Update
@@ -97,11 +113,11 @@ func (f *Funcionario) Deletar() {
 }
 
 // Read
-func ListarFuncionarios() {
+func ListarFuncionarios() []Funcionario {
 	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
 		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
-		return
+		return nil
 	}
 
 	fmt.Println("Lista de funcionários:")
@@ -109,6 +125,9 @@ func ListarFuncionarios() {
 		fmt.Printf("ID: %s, Nome: %s, CPF: %s, CEP: %s, Salário: %s, Data de Nascimento: %s, Sexo: %s, DepartamentoID: %d\n",
 			f.ID, f.Nome, f.CPF, f.CEP, f.Salario, f.DataNascimento, f.Sexo, f.DepartamentoID)
 	}
+	listaFuncionarios := []Funcionario{}
+	listaFuncionarios = append(listaFuncionarios, funcionarios...)
+	return listaFuncionarios
 }
 
 // Funções utilitárias
@@ -165,4 +184,18 @@ func sincronizarFuncionariosTxt(funcionarios []Funcionario) {
 	}
 
 	fmt.Println("Arquivo TXT sincronizado com sucesso.")
+}
+
+func GetFuncionariosIDs() []string {
+	funcionarios, err := CarregarFuncionarios()
+	if err != nil {
+		fmt.Printf("Erro ao carregar funcionarios: %v\n", err)
+		return nil
+	}
+
+	var ids []string
+	for _, f := range funcionarios {
+		ids = append(ids, f.ID)
+	}
+	return ids
 }

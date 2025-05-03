@@ -21,33 +21,54 @@ type Projeto struct {
 }
 
 // Create
-func (p *Projeto) Salvar() {
-	projetos, err := carregarProjetos()
+func (p *Projeto) Salvar(departamentos []int, funcionariosProjetos []string) string {
+	projetos, err := CarregarProjetos()
 	if err != nil {
-		fmt.Printf("Erro ao carregar projetos: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar projetos: %v\n", err)
 	}
 
 	for _, projeto := range projetos {
 		if projeto.ID == p.ID {
-			fmt.Printf("Erro: já existe um projeto com o ID %d. Ação não realizada.\n", p.ID)
-			return
+			return fmt.Sprintf("Erro: já existe um projeto com o ID %d. Ação não realizada.\n", p.ID)
 		}
+	}
+
+	departamentoValido := false
+	for _, departamentoID := range departamentos {
+		if p.DepartamentoID == departamentoID {
+			departamentoValido = true
+			break
+		}
+	}
+
+	if !departamentoValido {
+		return fmt.Sprintf("Erro: DepartamentoID %d não encontrado. Ação não realizada.\n", p.DepartamentoID)
+	}
+
+	funcionarioValido := false
+	for _, funcionarioID := range funcionariosProjetos {
+		if p.FuncionariosProjetosID == funcionarioID {
+			funcionarioValido = true
+			break
+		}
+	}
+
+	if !funcionarioValido {
+		return fmt.Sprintf("Erro: FuncionarioID %s não encontrado. Ação não realizada.\n", p.FuncionariosProjetosID)
 	}
 
 	projetos = append(projetos, *p)
 	if err := salvarProjetos(projetos); err != nil {
-		fmt.Printf("Erro ao salvar projeto: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao salvar projeto: %v\n", err)
 	}
 
-	fmt.Printf("Projeto com ID %d salvo com sucesso.\n", p.ID)
 	sincronizarProjetosTxt(projetos)
+	return fmt.Sprintf("Projeto com ID %d salvo com sucesso.\n", p.ID)
 }
 
 // Update
 func (p *Projeto) Atualizar() {
-	projetos, err := carregarProjetos()
+	projetos, err := CarregarProjetos()
 	if err != nil {
 		fmt.Printf("Erro ao carregar projetos: %v\n", err)
 		return
@@ -71,7 +92,7 @@ func (p *Projeto) Atualizar() {
 
 // Delete
 func (p *Projeto) Deletar() {
-	projetos, err := carregarProjetos()
+	projetos, err := CarregarProjetos()
 	if err != nil {
 		fmt.Printf("Erro ao carregar projetos: %v\n", err)
 		return
@@ -95,7 +116,7 @@ func (p *Projeto) Deletar() {
 
 // Read
 func ListarProjetos() {
-	projetos, err := carregarProjetos()
+	projetos, err := CarregarProjetos()
 	if err != nil {
 		fmt.Printf("Erro ao carregar projetos: %v\n", err)
 		return
@@ -110,7 +131,7 @@ func ListarProjetos() {
 
 // Funções utilitárias
 
-func carregarProjetos() ([]Projeto, error) {
+func CarregarProjetos() ([]Projeto, error) {
 	var projetos []Projeto
 
 	file, err := os.Open(arquivoProjetosJSON)
