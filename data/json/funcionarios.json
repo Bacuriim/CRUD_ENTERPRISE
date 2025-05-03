@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "id": "A",
+    "nome": "Alice",
+    "cpf": "123.456.789-00",
+    "cep": "12345-678",
+    "salario": "5000.00",
+    "data_nascimento": "1990-01-01",
+    "sexo": "Feminino",
+    "departamento_id": 1
+  },
+  {
+    "id": "B",
+    "nome": "Bob",
+    "cpf": "987.654.321-00",
+    "cep": "87654-321",
+    "salario": "6000.00",
+    "data_nascimento": "1985-05-05",
+    "sexo": "Masculino",
+    "departamento_id": 2
+  },
+  {
+    "id": "1",
+    "nome": "123",
+    "cpf": "124",
+    "cep": "125125",
+    "salario": "125125",
+    "data_nascimento": "1251251251",
+    "sexo": "125125125",
+    "departamento_id": 125125
+  },
+  {
+    "id": "123",
+    "nome": "123124124",
+    "cpf": "1251251",
+    "cep": "251251251",
+    "salario": "25125125125",
+    "data_nascimento": "1251251251251",
+    "sexo": "25125125125",
+    "departamento_id": 125125125125
+  },
+  {
+    "id": "",
+    "nome": "124124124",
+    "cpf": "124124",
+    "cep": "124124",
+    "salario": "124124",
+    "data_nascimento": "124",
+    "sexo": "124124",
+    "departamento_id": 1
+  }
+]

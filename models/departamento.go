@@ -19,33 +19,30 @@ type Departamento struct {
 }
 
 // Create
-func (d *Departamento) Salvar() {
-	departamentos, err := carregarDepartamentos()
+func (d *Departamento) Salvar() string {
+	departamentos, err := CarregarDepartamentos()
 	if err != nil {
-		fmt.Printf("Erro ao carregar departamentos: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar departamentos: %v\n", err)
 	}
 
 	for _, departamento := range departamentos {
 		if departamento.ID == d.ID {
-			fmt.Printf("Erro: já existe um departamento com o ID %d. Ação não realizada.\n", d.ID)
-			return
+			return fmt.Sprintf("Erro: já existe um departamento com o ID %d. Ação não realizada.\n", d.ID)
 		}
 	}
 
 	departamentos = append(departamentos, *d)
 	if err := salvarDepartamentos(departamentos); err != nil {
-		fmt.Printf("Erro ao salvar departamento: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao salvar departamento: %v\n", err)
 	}
 
-	fmt.Printf("Departamento com ID %d salvo com sucesso.\n", d.ID)
 	sincronizarDepartamentosTxt(departamentos)
+	return fmt.Sprintf("Departamento com ID %d salvo com sucesso.\n", d.ID)
 }
 
 // Update
 func (d *Departamento) Atualizar() {
-	departamentos, err := carregarDepartamentos()
+	departamentos, err := CarregarDepartamentos()
 	if err != nil {
 		fmt.Printf("Erro ao carregar departamentos: %v\n", err)
 		return
@@ -69,7 +66,7 @@ func (d *Departamento) Atualizar() {
 
 // Delete
 func (d *Departamento) Deletar() {
-	departamentos, err := carregarDepartamentos()
+	departamentos, err := CarregarDepartamentos()
 	if err != nil {
 		fmt.Printf("Erro ao carregar departamentos: %v\n", err)
 		return
@@ -91,23 +88,9 @@ func (d *Departamento) Deletar() {
 	fmt.Printf("Erro: departamento com ID %d não encontrado para exclusão. Ação não realizada.\n", d.ID)
 }
 
-// Read
-func ListarDepartamentos() {
-	departamentos, err := carregarDepartamentos()
-	if err != nil {
-		fmt.Printf("Erro ao carregar departamentos: %v\n", err)
-		return
-	}
-
-	fmt.Println("Lista de departamentos:")
-	for _, d := range departamentos {
-		fmt.Printf("ID: %d, Nome: %s, ChefeID: %d\n", d.ID, d.Nome, d.ChefeID)
-	}
-}
-
 // Funções utilitárias
 
-func carregarDepartamentos() ([]Departamento, error) {
+func CarregarDepartamentos() ([]Departamento, error) {
 	var departamentos []Departamento
 
 	file, err := os.Open(arquivoDepartamentosJSON)
@@ -158,4 +141,36 @@ func sincronizarDepartamentosTxt(departamentos []Departamento) {
 	}
 
 	fmt.Println("Arquivo TXT sincronizado com sucesso.")
+}
+
+// Read
+func ListarDepartamentos() []Departamento {
+	departamentos, err := CarregarDepartamentos()
+	if err != nil {
+		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
+		return nil
+	}
+
+	fmt.Println("Lista de funcionários:")
+	for _, d := range departamentos {
+		fmt.Printf("ID: %d, Nome: %s, ChefeID: %d\n",
+			d.ID, d.Nome, d.ChefeID)
+	}
+	listaDepartamentos := []Departamento{}
+	listaDepartamentos = append(listaDepartamentos, departamentos...)
+	return listaDepartamentos
+}
+
+func GetDepartamentosIDs() []int {
+	departamentos, err := CarregarDepartamentos()
+	if err != nil {
+		fmt.Printf("Erro ao carregar departamentos: %v\n", err)
+		return nil
+	}
+
+	var ids []int
+	for _, d := range departamentos {
+		ids = append(ids, d.ID)
+	}
+	return ids
 }

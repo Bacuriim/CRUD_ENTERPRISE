@@ -18,33 +18,46 @@ type ChefeDepartamento struct {
 }
 
 // Create
-func (c *ChefeDepartamento) Salvar() {
-	chefes, err := carregarChefesDepartamento()
+func (c *ChefeDepartamento) Salvar(funcionarios []string) string {
+	chefes, err := CarregarChefesDepartamento()
 	if err != nil {
-		fmt.Printf("Erro ao carregar chefes de departamento: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar chefes de departamento: %v\n", err)
 	}
 
 	for _, chefe := range chefes {
-		if chefe.ID == c.ID {
-			fmt.Printf("Erro: já existe um chefe de departamento com o ID %d. Ação não realizada.\n", c.ID)
-			return
+		if c.ID == 0 || c.FuncionarioID == "" {
+			return "Erro: todos os campos devem ser preenchidos. Ação não realizada.\n"
 		}
+
+		if chefe.ID == c.ID {
+			return fmt.Sprintf("Erro: já existe um chefe de departamento com o ID %d. Ação não realizada.\n", c.ID)
+		}
+	}
+
+	funcionarioValido := false
+	for _, funcionario := range funcionarios {
+		if c.FuncionarioID == funcionario {
+			funcionarioValido = true
+			break
+		}
+	}
+
+	if !funcionarioValido {
+		return fmt.Sprintf("Erro: FuncionarioID %s não encontrado. Ação não realizada.\n", c.FuncionarioID)
 	}
 
 	chefes = append(chefes, *c)
 	if err := salvarChefesDepartamento(chefes); err != nil {
-		fmt.Printf("Erro ao salvar chefe de departamento: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao salvar chefe de departamento: %v\n", err)
 	}
 
-	fmt.Printf("Chefe de departamento com ID %d salvo com sucesso.\n", c.ID)
 	sincronizarChefesDepartamentoTxt(chefes)
+	return fmt.Sprintf("Chefe de departamento com ID %d salvo com sucesso.\n", c.ID)
 }
 
 // Update
 func (c *ChefeDepartamento) Atualizar() {
-	chefes, err := carregarChefesDepartamento()
+	chefes, err := CarregarChefesDepartamento()
 	if err != nil {
 		fmt.Printf("Erro ao carregar chefes de departamento: %v\n", err)
 		return
@@ -68,7 +81,7 @@ func (c *ChefeDepartamento) Atualizar() {
 
 // Delete
 func (c *ChefeDepartamento) Deletar() {
-	chefes, err := carregarChefesDepartamento()
+	chefes, err := CarregarChefesDepartamento()
 	if err != nil {
 		fmt.Printf("Erro ao carregar chefes de departamento: %v\n", err)
 		return
@@ -92,7 +105,7 @@ func (c *ChefeDepartamento) Deletar() {
 
 // Read
 func ListarChefesDepartamento() {
-	chefes, err := carregarChefesDepartamento()
+	chefes, err := CarregarChefesDepartamento()
 	if err != nil {
 		fmt.Printf("Erro ao carregar chefes de departamento: %v\n", err)
 		return
@@ -106,7 +119,7 @@ func ListarChefesDepartamento() {
 
 // Funções utilitárias
 
-func carregarChefesDepartamento() ([]ChefeDepartamento, error) {
+func CarregarChefesDepartamento() ([]ChefeDepartamento, error) {
 	var chefes []ChefeDepartamento
 
 	file, err := os.Open(arquivoChefesDepartamentoJSON)

@@ -1,0 +1,129 @@
+package table_views
+
+import (
+	"crud-enterprise/models"
+	"crud-enterprise/utils"
+	"fmt"
+	"strconv"
+
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
+)
+
+func FuncionariosPage(myApp fyne.App, mainPage fyne.Window) {
+	employeesMainPage := myApp.NewWindow("Tabela de Funcionários")
+	employeesMainPage.Resize(fyne.NewSize(800, 600))
+
+	employeesListPage := myApp.NewWindow("Funcionários Existentes")
+	employeesListPage.Resize(fyne.NewSize(800, 600))
+
+	icon, err := fyne.LoadResourceFromPath("assets/imgs/CRUD_IMAGE.png") // Load the icon from a file
+	if err != nil {
+		fmt.Println("Erro ao carregar o ícone:", err)
+	} else {
+		employeesMainPage.SetIcon(icon)
+		employeesListPage.SetIcon(icon) // Set the icon for the main window
+	}
+
+	entryID := utils.CriarEntryLetrasNumeros("ID")
+	entryName := utils.CriarEntryLetrasNumeros("Nome")
+	entryCPF := utils.CriarEntryNumeros("CPF")
+	entryCEP := utils.CriarEntryNumeros("CEP")
+	entrySalario := utils.CriarEntryNumeros("Salário")
+	entryDataNascimento := utils.CriarEntryData("Data de Nascimento")
+	entrySexo := utils.CriarEntryLetras("Sexo")
+	entryDepartamentoID := utils.CriarEntryNumeros("ID do Departamento")
+
+	lbResultado := widget.NewLabel("Resultado: nenhum")
+
+	listaFuncionarios := container.NewVBox()
+	btnCriar := widget.NewButton("Criar funcionário", func() {
+		depID, err := strconv.Atoi(entryDepartamentoID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do departamento:", err)
+			return
+		} else {
+			entryDepartamentoID.SetText(strconv.Itoa(depID))
+		}
+		funcionario := models.Funcionario{
+			ID:             entryID.Text,
+			Nome:           entryName.Text,
+			CPF:            entryCPF.Text,
+			CEP:            entryCEP.Text,
+			Salario:        entrySalario.Text,
+			DataNascimento: entryDataNascimento.Text,
+			Sexo:           entrySexo.Text,
+			DepartamentoID: depID,
+		}
+		lbResultado.SetText("Resultado: " + funcionario.Salvar(models.GetDepartamentosIDs()))
+		utils.LimparCampos(entryID, entryName, entryCPF, entryCEP,
+			entrySalario, entryDataNascimento, entrySexo, entryDepartamentoID)
+	})
+	btnListar := widget.NewButton("Listar Funcionários", func() {
+		funcionarios, err := models.CarregarFuncionarios()
+		if err != nil {
+			fmt.Println("Erro:", err)
+			return
+		}
+
+		listaFuncionarios.RemoveAll()
+
+		for _, f := range funcionarios {
+			card := widget.NewCard(f.Nome,
+				"",
+				widget.NewLabel(fmt.Sprintf("ID: %s\nDepartamento: %d\nCPF: %s\nCEP: %s\nSalário: %s\nNascimento: %s\nSexo: %s",
+					f.ID, f.DepartamentoID, f.CPF, f.CEP, f.Salario, f.DataNascimento, f.Sexo)))
+			listaFuncionarios.Add(card)
+		}
+		employeesListPage.Show()
+
+		listaFuncionarios.Refresh()
+		employeesListPage.SetCloseIntercept(func() {
+			employeesListPage.Hide()
+		})
+	})
+
+	employeesListPage.SetContent(container.NewScroll(
+		listaFuncionarios,
+	))
+
+	rodape := widget.NewButton("Voltar", func() {
+		employeesMainPage.Hide()
+		employeesListPage.Hide()
+		mainPage.Show()
+	})
+
+	employeesMainPage.SetContent(container.NewBorder(
+		container.NewVBox(
+			entryID,
+			entryName,
+			entryCPF,
+			entryCEP,
+			entrySalario,
+			entryDataNascimento,
+			entrySexo,
+			entryDepartamentoID,
+		),
+		rodape,
+		nil,
+		nil,
+		container.NewVBox(
+			btnCriar,
+			btnListar,
+			lbResultado,
+		),
+	))
+
+	employeesMainPage.SetCloseIntercept(func() {
+		// utils.EsvaziarArquivoJSON("data/funcionarios.json")
+		// utils.EsvaziarArquivoJSON("data/departamentos.json")
+		// utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
+		// utils.EsvaziarArquivoJSON("data/funcionarios_projetos.json")
+		// utils.EsvaziarArquivoJSON("data/projetos.json")
+		employeesMainPage.Close()
+		mainPage.Show()
+	})
+
+	employeesMainPage.Show()
+}
