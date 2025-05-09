@@ -48,6 +48,24 @@ func ChefeDepartamentoPage(myApp fyne.App, mainPage fyne.Window) {
 		utils.LimparCampos(entryID, entryFuncionarioID)
 	})
 
+	btnAlterar := widget.NewButton("Alterar chefe de departamento", func() {
+		chefeID, err := strconv.Atoi(entryID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do Chefe:", err)
+			return
+		} else {
+			entryID.SetText(strconv.Itoa(chefeID))
+		}
+
+		chefeDepartamento := models.ChefeDepartamento{
+			ID:            chefeID,
+			FuncionarioID: entryFuncionarioID.Text,
+		}
+
+		lbResultado.SetText("Resultado: " + chefeDepartamento.Atualizar())
+		utils.LimparCampos(entryID, entryFuncionarioID)
+	})
+
 	btnListar := widget.NewButton("Listar Chefes de Departamentos", func() {
 		chefeDepartamentos, err := models.CarregarChefesDepartamento()
 		if err != nil {
@@ -72,6 +90,21 @@ func ChefeDepartamentoPage(myApp fyne.App, mainPage fyne.Window) {
 		})
 	})
 
+	btnDeletar := widget.NewButton("Deletar chefe de departamento", func() {
+		chefeID, err := strconv.Atoi(entryID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do Chefe:", err)
+			return
+		} else {
+			entryID.SetText(strconv.Itoa(chefeID))
+		}
+		chefeDepartamento := models.ChefeDepartamento{
+			ID: chefeID,
+		}
+		lbResultado.SetText("Resultado: " + chefeDepartamento.Deletar())
+		utils.LimparCampos(entryID, entryFuncionarioID)
+	})
+
 	chefeDepartamentoListPage.SetContent(container.NewScroll(
 		listaChefesDepartamentos,
 	))
@@ -92,17 +125,19 @@ func ChefeDepartamentoPage(myApp fyne.App, mainPage fyne.Window) {
 		nil,
 		container.NewVBox(
 			btnCriar,
+			btnAlterar,
 			btnListar,
+			btnDeletar,
 			lbResultado,
 		),
 	))
 
 	chefeDepartamentoMainPage.SetCloseIntercept(func() {
-		// utils.EsvaziarArquivoJSON("data/Departamentos.json")
-		// utils.EsvaziarArquivoJSON("data/departamentos.json")
-		// utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
-		// utils.EsvaziarArquivoJSON("data/Departamentos_projetos.json")
-		// utils.EsvaziarArquivoJSON("data/projetos.json")
+		utils.EsvaziarArquivoJSON("data/Departamentos.json")
+		utils.EsvaziarArquivoJSON("data/departamentos.json")
+		utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
+		utils.EsvaziarArquivoJSON("data/Departamentos_projetos.json")
+		utils.EsvaziarArquivoJSON("data/projetos.json")
 		chefeDepartamentoMainPage.Close()
 		mainPage.Show()
 	})

@@ -60,6 +60,30 @@ func DepartamentosPage(myApp fyne.App, mainPage fyne.Window) {
 		utils.LimparCampos(entryID, entryName, entryBossID)
 	})
 
+	btnAlterar := widget.NewButton("Alterar departamento", func() {
+		chefeID, err := strconv.Atoi(entryBossID.Text)
+		if err != nil {
+			fmt.Print("Erro ao converter ID do Chefe:", err)
+			return
+		} else {
+			entryBossID.SetText(strconv.Itoa(chefeID))
+		}
+		DepartamentoID, err := strconv.Atoi(entryID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do Departamento:", err)
+			return
+		} else {
+			entryID.SetText(strconv.Itoa(DepartamentoID))
+		}
+		Departamento := models.Departamento{
+			ID:      DepartamentoID,
+			Nome:    entryName.Text,
+			ChefeID: chefeID,
+		}
+		lbResultado.SetText("Resultado: " + Departamento.Atualizar())
+		utils.LimparCampos(entryID, entryName, entryBossID)
+	})
+
 	btnListar := widget.NewButton("Listar Departamentos", func() {
 		Departamentos, err := models.CarregarDepartamentos()
 		if err != nil {
@@ -72,7 +96,7 @@ func DepartamentosPage(myApp fyne.App, mainPage fyne.Window) {
 		for _, d := range Departamentos {
 			card := widget.NewCard(d.Nome,
 				"",
-				widget.NewLabel(fmt.Sprintf("ID: %d\nChefeID: %d",
+				widget.NewLabel(fmt.Sprintf("ID: %d\nDepartamentoID: %d",
 					d.ID, d.ChefeID)))
 			listaDepartamentos.Add(card)
 		}
@@ -82,6 +106,23 @@ func DepartamentosPage(myApp fyne.App, mainPage fyne.Window) {
 		departmentsListPage.SetCloseIntercept(func() {
 			departmentsListPage.Hide()
 		})
+	})
+
+	btnDeletar := widget.NewButton("Deletar departamento", func() {
+		DepartamentoID, err := strconv.Atoi(entryID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do Departamento:", err)
+			return
+		} else {
+			entryID.SetText(strconv.Itoa(DepartamentoID))
+		}
+		Departamento := models.Departamento{
+			ID:      DepartamentoID,
+			Nome:    entryName.Text,
+			ChefeID: 0,
+		}
+		lbResultado.SetText("Resultado: " + Departamento.Deletar())
+		utils.LimparCampos(entryID, entryName, entryBossID)
 	})
 
 	departmentsListPage.SetContent(container.NewScroll(
@@ -105,17 +146,19 @@ func DepartamentosPage(myApp fyne.App, mainPage fyne.Window) {
 		nil,
 		container.NewVBox(
 			btnCriar,
+			btnAlterar,
 			btnListar,
+			btnDeletar,
 			lbResultado,
 		),
 	))
 
 	departmentsMainPage.SetCloseIntercept(func() {
-		// utils.EsvaziarArquivoJSON("data/Departamentos.json")
-		// utils.EsvaziarArquivoJSON("data/departamentos.json")
-		// utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
-		// utils.EsvaziarArquivoJSON("data/Departamentos_projetos.json")
-		// utils.EsvaziarArquivoJSON("data/projetos.json")
+		utils.EsvaziarArquivoJSON("data/Departamentos.json")
+		utils.EsvaziarArquivoJSON("data/departamentos.json")
+		utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
+		utils.EsvaziarArquivoJSON("data/Departamentos_projetos.json")
+		utils.EsvaziarArquivoJSON("data/projetos.json")
 		departmentsMainPage.Close()
 		mainPage.Show()
 	})

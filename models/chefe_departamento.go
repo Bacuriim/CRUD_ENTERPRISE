@@ -56,51 +56,45 @@ func (c *ChefeDepartamento) Salvar(funcionarios []string) string {
 }
 
 // Update
-func (c *ChefeDepartamento) Atualizar() {
+func (c *ChefeDepartamento) Atualizar() string {
 	chefes, err := CarregarChefesDepartamento()
 	if err != nil {
-		fmt.Printf("Erro ao carregar chefes de departamento: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar chefes de departamento: %v\n", err)
 	}
 
 	for i, chefe := range chefes {
 		if chefe.ID == c.ID {
 			chefes[i] = *c
 			if err := salvarChefesDepartamento(chefes); err != nil {
-				fmt.Printf("Erro ao atualizar chefe de departamento: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao atualizar chefe de departamento: %v\n", err)
 			}
-			fmt.Printf("Chefe de departamento com ID %d atualizado com sucesso.\n", c.ID)
 			sincronizarChefesDepartamentoTxt(chefes)
-			return
+			return fmt.Sprintf("Chefe de departamento com ID %d atualizado com sucesso.\n", c.ID)
 		}
 	}
 
-	fmt.Printf("Erro: chefe de departamento com ID %d não encontrado para atualização. Ação não realizada.\n", c.ID)
+	return fmt.Sprintf("Erro: chefe de departamento com ID %d não encontrado para atualização. Ação não realizada.\n", c.ID)
 }
 
 // Delete
-func (c *ChefeDepartamento) Deletar() {
+func (c *ChefeDepartamento) Deletar() string {
 	chefes, err := CarregarChefesDepartamento()
 	if err != nil {
-		fmt.Printf("Erro ao carregar chefes de departamento: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar chefes de departamento: %v\n", err)
 	}
 
 	for i, chefe := range chefes {
 		if chefe.ID == c.ID {
 			chefes = append(chefes[:i], chefes[i+1:]...)
 			if err := salvarChefesDepartamento(chefes); err != nil {
-				fmt.Printf("Erro ao deletar chefe de departamento: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao deletar chefe de departamento: %v\n", err)
 			}
-			fmt.Printf("Chefe de departamento com ID %d deletado com sucesso.\n", c.ID)
 			sincronizarChefesDepartamentoTxt(chefes)
-			return
+			return fmt.Sprintf("Chefe de departamento com ID %d deletado com sucesso.\n", c.ID)
 		}
 	}
 
-	fmt.Printf("Erro: chefe de departamento com ID %d não encontrado para exclusão. Ação não realizada.\n", c.ID)
+	return fmt.Sprintf("Erro: chefe de departamento com ID %d não encontrado para exclusão. Ação não realizada.\n", c.ID)
 }
 
 // Read

@@ -60,6 +60,30 @@ func FuncionariosPage(myApp fyne.App, mainPage fyne.Window) {
 		utils.LimparCampos(entryID, entryName, entryCPF, entryCEP,
 			entrySalario, entryDataNascimento, entrySexo, entryDepartamentoID)
 	})
+
+	btnAlterar := widget.NewButton("Alterar funcionários", func() {
+		depID, err := strconv.Atoi(entryDepartamentoID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do departamento:", err)
+			return
+		} else {
+			entryDepartamentoID.SetText(strconv.Itoa(depID))
+		}
+		funcionario := models.Funcionario{
+			ID:             entryID.Text,
+			Nome:           entryName.Text,
+			CPF:            entryCPF.Text,
+			CEP:            entryCEP.Text,
+			Salario:        entrySalario.Text,
+			DataNascimento: entryDataNascimento.Text,
+			Sexo:           entrySexo.Text,
+			DepartamentoID: depID,
+		}
+		lbResultado.SetText("Resultado: " + funcionario.Atualizar())
+		utils.LimparCampos(entryID, entryName, entryCPF, entryCEP,
+			entrySalario, entryDataNascimento, entrySexo, entryDepartamentoID)
+	})
+
 	btnListar := widget.NewButton("Listar Funcionários", func() {
 		funcionarios, err := models.CarregarFuncionarios()
 		if err != nil {
@@ -82,6 +106,28 @@ func FuncionariosPage(myApp fyne.App, mainPage fyne.Window) {
 		employeesListPage.SetCloseIntercept(func() {
 			employeesListPage.Hide()
 		})
+	})
+
+	btnDeletar := widget.NewButton("Deletar funcionário", func() {
+		funcionarioID := entryID.Text
+		if funcionarioID == "" {
+			lbResultado.SetText("Erro: ID do funcionário não pode ser vazio.")
+			return
+		}
+
+		funcionario := models.Funcionario{
+			ID:             funcionarioID,
+			Nome:           entryName.Text,
+			CPF:            entryCPF.Text,
+			CEP:            entryCEP.Text,
+			Salario:        entrySalario.Text,
+			DataNascimento: entryDataNascimento.Text,
+			Sexo:           entrySexo.Text,
+			DepartamentoID: 0,
+		}
+		lbResultado.SetText("Resultado: " + funcionario.Deletar())
+		utils.LimparCampos(entryID, entryName, entryCPF, entryCEP,
+			entrySalario, entryDataNascimento, entrySexo, entryDepartamentoID)
 	})
 
 	employeesListPage.SetContent(container.NewScroll(
@@ -110,17 +156,19 @@ func FuncionariosPage(myApp fyne.App, mainPage fyne.Window) {
 		nil,
 		container.NewVBox(
 			btnCriar,
+			btnAlterar,
 			btnListar,
+			btnDeletar,
 			lbResultado,
 		),
 	))
 
 	employeesMainPage.SetCloseIntercept(func() {
-		// utils.EsvaziarArquivoJSON("data/funcionarios.json")
-		// utils.EsvaziarArquivoJSON("data/departamentos.json")
-		// utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
-		// utils.EsvaziarArquivoJSON("data/funcionarios_projetos.json")
-		// utils.EsvaziarArquivoJSON("data/projetos.json")
+		utils.EsvaziarArquivoJSON("data/funcionarios.json")
+		utils.EsvaziarArquivoJSON("data/departamentos.json")
+		utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
+		utils.EsvaziarArquivoJSON("data/funcionarios_projetos.json")
+		utils.EsvaziarArquivoJSON("data/projetos.json")
 		employeesMainPage.Close()
 		mainPage.Show()
 	})

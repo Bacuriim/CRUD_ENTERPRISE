@@ -41,51 +41,45 @@ func (d *Departamento) Salvar() string {
 }
 
 // Update
-func (d *Departamento) Atualizar() {
+func (d *Departamento) Atualizar() string {
 	departamentos, err := CarregarDepartamentos()
 	if err != nil {
-		fmt.Printf("Erro ao carregar departamentos: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar departamentos: %v\n", err)
 	}
 
 	for i, departamento := range departamentos {
 		if departamento.ID == d.ID {
 			departamentos[i] = *d
 			if err := salvarDepartamentos(departamentos); err != nil {
-				fmt.Printf("Erro ao atualizar departamento: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao atualizar departamento: %v\n", err)
 			}
-			fmt.Printf("Departamento com ID %d atualizado com sucesso.\n", d.ID)
 			sincronizarDepartamentosTxt(departamentos)
-			return
+			return fmt.Sprintf("Departamento com ID %d atualizado com sucesso.\n", d.ID)
 		}
 	}
 
-	fmt.Printf("Erro: departamento com ID %d não encontrado para atualização. Ação não realizada.\n", d.ID)
+	return fmt.Sprintf("Erro: departamento com ID %d não encontrado para atualização. Ação não realizada.\n", d.ID)
 }
 
 // Delete
-func (d *Departamento) Deletar() {
+func (d *Departamento) Deletar() string {
 	departamentos, err := CarregarDepartamentos()
 	if err != nil {
-		fmt.Printf("Erro ao carregar departamentos: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar departamentos: %v\n", err)
 	}
 
 	for i, departamento := range departamentos {
 		if departamento.ID == d.ID {
 			departamentos = append(departamentos[:i], departamentos[i+1:]...)
 			if err := salvarDepartamentos(departamentos); err != nil {
-				fmt.Printf("Erro ao deletar departamento: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao deletar departamento: %v\n", err)
 			}
-			fmt.Printf("Departamento com ID %d deletado com sucesso.\n", d.ID)
 			sincronizarDepartamentosTxt(departamentos)
-			return
+			return fmt.Sprintf("Departamento com ID %d deletado com sucesso.\n", d.ID)
 		}
 	}
 
-	fmt.Printf("Erro: departamento com ID %d não encontrado para exclusão. Ação não realizada.\n", d.ID)
+	return fmt.Sprintf("Erro: departamento com ID %d não encontrado para exclusão. Ação não realizada.\n", d.ID)
 }
 
 // Funções utilitárias
