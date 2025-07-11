@@ -63,6 +63,36 @@ func ProjetosPage(myApp fyne.App, mainPage fyne.Window) {
 		utils.LimparCampos(entryID, entryName, entryLocal, entryDepartmentID,
 			entryEmployeesProjectsID)
 	})
+
+	btnAlterar := widget.NewButton("Alterar projetos", func() {
+		projectID, err := strconv.Atoi(entryID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do departamento:", err)
+			return
+		} else {
+			entryID.SetText(strconv.Itoa(projectID))
+		}
+
+		depID, err := strconv.Atoi(entryDepartmentID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do departamento:", err)
+			return
+		} else {
+			entryDepartmentID.SetText(strconv.Itoa(depID))
+		}
+
+		projeto := models.Projeto{
+			ID:                     projectID,
+			Nome:                   entryName.Text,
+			Local:                  entryLocal.Text,
+			DepartamentoID:         depID,
+			FuncionariosProjetosID: entryEmployeesProjectsID.Text,
+		}
+		lbResultado.SetText("Resultado: " + projeto.Atualizar())
+		utils.LimparCampos(entryID, entryName, entryLocal, entryDepartmentID,
+			entryEmployeesProjectsID)
+	})
+
 	btnListar := widget.NewButton("Listar Projetos", func() {
 		projetos, err := models.CarregarProjetos()
 		if err != nil {
@@ -85,6 +115,27 @@ func ProjetosPage(myApp fyne.App, mainPage fyne.Window) {
 		projectsListPage.SetCloseIntercept(func() {
 			projectsListPage.Hide()
 		})
+	})
+
+	btnDeletar := widget.NewButton("Deletar projeto", func() {
+		projectID, err := strconv.Atoi(entryID.Text)
+		if err != nil {
+			fmt.Println("Erro ao converter ID do departamento:", err)
+			return
+		} else {
+			entryID.SetText(strconv.Itoa(projectID))
+		}
+
+		projeto := models.Projeto{
+			ID:                     projectID,
+			Nome:                   entryName.Text,
+			Local:                  entryLocal.Text,
+			DepartamentoID:         0,
+			FuncionariosProjetosID: entryEmployeesProjectsID.Text,
+		}
+		lbResultado.SetText("Resultado: " + projeto.Deletar())
+		utils.LimparCampos(entryID, entryName, entryLocal, entryDepartmentID,
+			entryEmployeesProjectsID)
 	})
 
 	projectsListPage.SetContent(container.NewScroll(
@@ -110,17 +161,19 @@ func ProjetosPage(myApp fyne.App, mainPage fyne.Window) {
 		nil,
 		container.NewVBox(
 			btnCriar,
+			btnAlterar,
 			btnListar,
+			btnDeletar,
 			lbResultado,
 		),
 	))
 
 	projectsMainPage.SetCloseIntercept(func() {
-		// utils.EsvaziarArquivoJSON("data/funcionarios.json")
-		// utils.EsvaziarArquivoJSON("data/departamentos.json")
-		// utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
-		// utils.EsvaziarArquivoJSON("data/funcionarios_projetos.json")
-		// utils.EsvaziarArquivoJSON("data/projetos.json")
+		utils.EsvaziarArquivoJSON("data/funcionarios.json")
+		utils.EsvaziarArquivoJSON("data/departamentos.json")
+		utils.EsvaziarArquivoJSON("data/chefes_departamento.json")
+		utils.EsvaziarArquivoJSON("data/funcionarios_projetos.json")
+		utils.EsvaziarArquivoJSON("data/projetos.json")
 		projectsMainPage.Close()
 		mainPage.Show()
 	})

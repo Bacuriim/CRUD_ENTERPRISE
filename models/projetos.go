@@ -67,51 +67,45 @@ func (p *Projeto) Salvar(departamentos []int, funcionariosProjetos []string) str
 }
 
 // Update
-func (p *Projeto) Atualizar() {
+func (p *Projeto) Atualizar() string {
 	projetos, err := CarregarProjetos()
 	if err != nil {
-		fmt.Printf("Erro ao carregar projetos: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar projetos: %v\n", err)
 	}
 
 	for i, projeto := range projetos {
 		if projeto.ID == p.ID {
 			projetos[i] = *p
 			if err := salvarProjetos(projetos); err != nil {
-				fmt.Printf("Erro ao atualizar projeto: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao atualizar projeto: %v\n", err)
 			}
-			fmt.Printf("Projeto com ID %d atualizado com sucesso.\n", p.ID)
 			sincronizarProjetosTxt(projetos)
-			return
+			return fmt.Sprintf("Projeto com ID %d atualizado com sucesso.\n", p.ID)
 		}
 	}
 
-	fmt.Printf("Erro: projeto com ID %d não encontrado para atualização. Ação não realizada.\n", p.ID)
+	return fmt.Sprintf("Erro: projeto com ID %d não encontrado para atualização. Ação não realizada.\n", p.ID)
 }
 
 // Delete
-func (p *Projeto) Deletar() {
+func (p *Projeto) Deletar() string {
 	projetos, err := CarregarProjetos()
 	if err != nil {
-		fmt.Printf("Erro ao carregar projetos: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar projetos: %v\n", err)
 	}
 
 	for i, projeto := range projetos {
 		if projeto.ID == p.ID {
 			projetos = append(projetos[:i], projetos[i+1:]...)
 			if err := salvarProjetos(projetos); err != nil {
-				fmt.Printf("Erro ao deletar projeto: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao deletar projeto: %v\n", err)
 			}
-			fmt.Printf("Projeto com ID %d deletado com sucesso.\n", p.ID)
 			sincronizarProjetosTxt(projetos)
-			return
+			return fmt.Sprintf("Projeto com ID %d deletado com sucesso.\n", p.ID)
 		}
 	}
 
-	fmt.Printf("Erro: projeto com ID %d não encontrado para exclusão. Ação não realizada.\n", p.ID)
+	return fmt.Sprintf("Erro: projeto com ID %d não encontrado para exclusão. Ação não realizada.\n", p.ID)
 }
 
 // Read

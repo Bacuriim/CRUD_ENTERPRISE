@@ -65,51 +65,45 @@ func (f *Funcionario) Salvar(departamentos []int) string {
 }
 
 // Update
-func (f *Funcionario) Atualizar() {
+func (f *Funcionario) Atualizar() string {
 	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
-		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar funcionários: %v\n", err)
 	}
 
 	for i, funcionario := range funcionarios {
 		if funcionario.ID == f.ID {
 			funcionarios[i] = *f
 			if err := salvarFuncionarios(funcionarios); err != nil {
-				fmt.Printf("Erro ao atualizar funcionário: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao atualizar funcionário: %v\n", err)
 			}
-			fmt.Printf("Funcionário com ID %s atualizado com sucesso.\n", f.ID)
 			sincronizarFuncionariosTxt(funcionarios)
-			return
+			return fmt.Sprintf("Funcionário com ID %s atualizado com sucesso.\n", f.ID)
 		}
 	}
 
-	fmt.Printf("Erro: funcionário com ID %s não encontrado para atualização. Ação não realizada.\n", f.ID)
+	return fmt.Sprintf("Erro: funcionário com ID %s não encontrado para atualização. Ação não realizada.\n", f.ID)
 }
 
 // Delete
-func (f *Funcionario) Deletar() {
+func (f *Funcionario) Deletar() string {
 	funcionarios, err := CarregarFuncionarios()
 	if err != nil {
-		fmt.Printf("Erro ao carregar funcionários: %v\n", err)
-		return
+		return fmt.Sprintf("Erro ao carregar funcionários: %v\n", err)
 	}
 
 	for i, funcionario := range funcionarios {
 		if funcionario.ID == f.ID {
 			funcionarios = append(funcionarios[:i], funcionarios[i+1:]...)
 			if err := salvarFuncionarios(funcionarios); err != nil {
-				fmt.Printf("Erro ao deletar funcionário: %v\n", err)
-				return
+				return fmt.Sprintf("Erro ao deletar funcionário: %v\n", err)
 			}
-			fmt.Printf("Funcionário com ID %s deletado com sucesso.\n", f.ID)
 			sincronizarFuncionariosTxt(funcionarios)
-			return
+			return fmt.Sprintf("Funcionário com ID %s deletado com sucesso.\n", f.ID)
 		}
 	}
 
-	fmt.Printf("Erro: funcionário com ID %s não encontrado para exclusão. Ação não realizada.\n", f.ID)
+	return fmt.Sprintf("Erro: funcionário com ID %s não encontrado para exclusão. Ação não realizada.\n", f.ID)
 }
 
 // Read
